@@ -107,7 +107,7 @@ tesla %>% ggplot(aes()) +
   labs() +
   theme_dark()
   
-stock_prices %>%  ggplot( mapping = aes(x = 1, y = adjusted)) +
+stock_prices %>%  ggplot( aes(x = 1, y = adjusted)) +
        geom_boxplot() +
        coord_flip() +
        facet_wrap(.~ symbol, scales = "free") +

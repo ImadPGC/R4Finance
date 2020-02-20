@@ -17,7 +17,7 @@ library(readxl)
 
 # Import -------------------------------------------------------------------
 
-tickers <- read_excel("C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/data/tickers.xlsx")
+tickers <- read_excel("~/R4Finance/data/tickers.xlsx")
 
 # Tema --------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ ui <- dashboardPagePlus(
                 tabItems(
                     tabItem(tabName = "exp",
                             fluidPage(
-                              titlePanel("Simulating via GBM"),
+                              
                               fluidRow(
                                 withMathJax(includeMarkdown("include.Rmd"))
                               )

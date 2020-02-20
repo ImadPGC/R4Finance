@@ -74,7 +74,7 @@ theme_pro <- function(){
 \pagestyle{fancy}
 \addtolength{\headheight}{1.0cm}
 \pagestyle{fancyplain}
-\rhead{\includegraphics[height=1cm]{C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/imgs/itam.png}}
+\rhead{\includegraphics[height=1cm]{C:/Users/jgpen/Documents/R4Finance/imgs/itam.png}}
 
 ```{r set_up, include = FALSE}
 

@@ -6,6 +6,8 @@ output: html_document
   mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 ---
 
+### Simulación via Browniano Geométrico
+
 En el contexto de *Asset Pricing* y en particular en **Option Valuation** es de interés simular posibles trayectorias para un determinado activo, para esto es necesario establecer una froma funcional para el precio.
 
 Una de las herramientas más utilizadas para esta tarea es el *Movimiento Browniano Geométrico*. Hay que notar que este **no es un modelo de series de tiempo** es una **ecuasión diferencial estocástica**. 
