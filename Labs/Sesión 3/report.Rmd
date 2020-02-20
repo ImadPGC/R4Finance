@@ -1,0 +1,307 @@
+---
+title: "Stock Beta"
+subtitle: "CAPM"
+author: "Tu nombre aqui"
+header-includes: 
+  - \usepackage{fancyhdr}
+date: "Fecha"
+output: 
+   pdf_document:
+    toc: TRUE
+    highlight: 'kate'
+    number_sections: TRUE
+editor_options: 
+  chunk_output_type: console
+mainfont: Bookman Old Style
+abstract: "This is my abstract."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) # Esta opci??n hace que por default se imprima el c??digo
+knitr::opts_chunk$set(warning = FALSE) # Estas dos opciones evitan que se impriman mensajes a la hora de generar el pdf
+knitr::opts_chunk$set(message= FALSE)
+
+#Estas L??neas sirven para ajustar tama??o y orientaci??n de las gr??ficas
+knitr::opts_chunk$set(fig.width=8)
+knitr::opts_chunk$set(fig.height=5)
+knitr::opts_chunk$set(fig.align='center')
+
+theme_pro <- function(){
+  theme_minimal() +
+    theme(
+      text = element_text(family = "Bookman", color = "gray25"),
+      plot.title = element_text(color = "#2C3744", 
+                                size = 18, 
+                                face = "bold"),
+      plot.subtitle = element_text(color = "#A6A6A7",
+                                   size = 16,
+                                   face = "bold"),
+      plot.caption = element_text(color = "#A6A6A7",
+                                  size = 12,
+                                  face = "bold"),
+      plot.background = element_rect(fill = "white"),
+      plot.margin = unit(c(5, 10, 5, 10), units = "mm"),
+      axis.title.x = element_text(color = "#FF7B05",
+                                  size = 12,
+                                  face = "bold"),
+      axis.title.y = element_text(color = "#FF7B05",
+                                  size = 12,
+                                  face = "bold"),
+      axis.text.x = element_text(color = "#531F7E",
+                                 face = "bold"),
+      axis.text.y = element_text(color = "#531F7E",
+                                 face = "bold"),
+      axis.line = element_line(color="#A6A6A7"),
+      strip.text = element_text(color = "#2C3744",
+                                face = "bold"),
+      legend.title = element_text(color ="#A6A6A7",
+                                  face = "bold"),
+      legend.text = element_text(color = "#2C3744",
+                                 face = "bold")
+    )
+} 
+```
+
+\thispagestyle{empty}
+\pagebreak
+\newpage
+\pagenumbering{arabic} 
+\fancyhead[L]{\thepage}
+\fancyhead[C]{RMarkDown}
+\fancyfoot[L]{Gibrán Peniche}
+\fancyfoot[C]{R for finance}
+\fancyfoot[R]{ITAM}
+\pagestyle{fancy}
+\addtolength{\headheight}{1.0cm}
+\pagestyle{fancyplain}
+\rhead{\includegraphics[height=1cm]{C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/imgs/itam.png}}
+
+```{r set_up, include = FALSE}
+
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(PerformanceAnalytics)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(naniar)
+library(pander)
+library(egg)
+
+```
+
+
+# Riesgo de Mercado medido por el CAPM
+## El problema
+
+En el contexto de **Asset Pricing** nos encontramos con el problema de *estimar* el precio (en terminos de su retorno así como el riesgo asociado a este retorno) de los activos riesgosos. 
+
+Una manera de tratar este problema lo propusieron *Jack Treyno* (1961, 1962), *William F. Sharpe* (1964) y *John Lintner* (1965) partiendo de un problema de maximización/minimización de la razón retorno - riesgo para un portafolio de activos riesgosos.
+
+Específicamente el CAPM es una herramienta que pretende medir la relación entre el *retorno esperado* de un activo y su relación con el *riesgo sistemático*.
+
+En los ramos de las finanzas corporativas y administración de portafolios el uso del CAPM es *EL* modelo más utilizado, no solo desde la perspectiva de asset pricing, si no como una métrica de desempeño para los portafolios.
+
+En este documento estudiaremos los retos que implica la implementación de este modelo con datos del mundo real, así como un somero repaso de los supuestos detras del CAPM. 
+
+## El modelo
+
+En un portafolio de activos riesgosos, al aumentar el no. de activos, el riesgo instrínseco que aporta cada activo, medido por la desviación estándar, tiende a anularse. Es decir, para un portafolio bien diversificado $\sigma_p \rightarrow 0$. Sin embargo hay unidades residuales de riesgo no atribuibles a los activos sino al mercado que permanancen latentes aún ante una diversificación "completa". ¿Cómo medimos este riesgo residual?
+
+Muy a grandes rasgos, si consideramos que el retorno de los activos se puede explicar mediante el modelo de un solo factor, con este siendo el retorno del mercado al resolver el problema de maximización: $max\{ r_p\} \frac{rp - rf}{\sigma_p} = sharpe$ $ratio$ s.a $\sigma_p > 0$ encontraremos no solo que la combinación de activos que maximiza las unidades de retorno en exceso de una unidad de riesgo es de hecho el portafolio de mercado, si no que, el número que mide el riesgo sistemático existe y se le conoce como la beta ($\beta$) del activo.
+
+Por la manera en la que se plantea el problema este número coincide con la beta de ua reggressión líneal entre el mercado, la tasa libre de riesgo y el activo al que queremos ponerle precio. Esta relación tiene la siguiente forma $r_a = r_f + \beta_a[r_m - r_f]$.
+
+# Implementación
+
+Para estimar el modelo utilizaremos el modelo de mercado propuesto por Famma & MacBeth de la forma $r_a - r_f = \beta_a[r_m-r_f]$ y ajustaremos un modelo de regresión normal simple sobre estos datos.
+
+Si el modelo es correcto la interssión debería ser cero, generalmente esto no ocurre y a estas desviaciones del CAPM se le conoce como la $\alpha$ del activo y son muy utilizadas como mpetricas de desempeño para los administradores de activos.
+
+## Detalles Técnicos
+
+  1. Para la implementación de este modelo como propuesto por Famma & MacBeth partimos de 5 años de datos de precios diarios.
+  2. Usaremos precios diarios ajustados (por dividendos)
+  3. Generalmente va a ocurrir que el mundo real es bastante feo y nos vamos a encontrar con información incompleta debemos darle un tratamientoe especial a estos datos.
+  4. Debe haber infromación completa para todo el periodo del activo y el mercado.
+  5. La tasa libre de riesgo debe ser de hecho libre de riesgo y debe corresponder al horizonte de inversión.
+
+### Resumen de Datos
+
+ 
+```{r import, echo=FALSE}
+
+tesla <- as_data_frame(read_csv("C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/data/TSLA.csv")) %>% 
+         select(Date, "Adj Close")
+
+colnames(tesla) <- c("date", "tesla")
+
+tesla <- tesla %>% 
+         mutate(date = dmy(date),
+                tesla = as.numeric(tesla)) %>% 
+         tq_transmute(select = tesla,
+                      mutate_fun =  dailyReturn,
+                      col_rename = "tesla") 
+
+sp <- as_data_frame(read_csv("C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/data/^GSPC.csv")) %>% 
+         select(Date, "Adj Close")
+
+colnames(sp) <- c("date", "sp")
+
+sp <- sp %>% 
+         mutate(date = ymd(date),
+                tesla = as.numeric(sp)) %>% 
+        tq_transmute(select     = sp, 
+               mutate_fun = periodReturn, 
+               period     = "daily", 
+               col_rename = "sp")
+
+rf <- "DGS1" %>% 
+       tq_get(
+         get = "economic.data",
+         from = "2015-02-06",
+         to = "2020-02-06",
+       ) 
+
+colnames(rf) <- c("date", "rf") 
+
+rf <- rf %>% 
+       mutate(date = ymd(date),
+              rf = as.numeric(rf)/1200)
+
+assets <- left_join(tesla, sp, by = "date")
+
+assets <- left_join(assets,rf, by = "date")
+
+```
+
+Resumen datos con periodicidad diaria
+
+```{r resumen, echo=FALSE}
+
+pander(summary(assets), "Resumen de datos 1")
+
+pander(str(assets), "resumen de datos 2")
+
+```
+
+
+
+Encontramos datos no disponibles (NA's) en las columnas *tesla* Y *rf*, debemos de imputarlos por un método adecuado y tenerlos siempre en el radar.
+
+### Tratamiento de datos faltantes
+####  Visualización
+
+```{r vissmiss, echo=FALSE}
+
+miss1 <- vis_miss(assets) +
+  labs(title = "Datos faltantes") +
+  theme_pro()
+
+miss2 <- gg_miss_var(assets) + theme_pro()
+
+ggarrange(miss1,miss2, nrow = 2)
+
+```
+
+Creamos "Datos Nabulares" para rastrear los datos faltantes y las imputaciones e imputamos por combinación líneal.
+
+```{r nab, echo=FALSE}
+
+assets_imp <- add_label_missings(assets) %>% 
+             mutate(tesla_imp = na.approx(tesla),
+                    rf_imp = na.approx(rf))
+
+
+```
+### Agregación y Temporalidad
+
+Estamos trabajando con retornos diarios, según el procedimiento propuesto po Famma & MacBeth debemos agregar los datos a temporalidad mensual y con estos 60 puntos de información ajustar el modelo de regresión.
+
+#### Agregados vs. Promedios
+
+Hay una discusión importante sobre que tipo de retornos son un mejor proxy para el retorno esperado (que no podemos observar con anticipación) los compuestos($\Pi_{i=1}^{n} ( 1+r_i)$) o los promedio ($\frac{1}{n}\sum_{i=1}^nr_i$).
+
+Nosotros usaremos retornos esperados promedio tomando como punto de partida el argumetno (económico y estadístico) de que el promedio suaviza las *sorpresas de infromación* introduciendo menos **ruido** (variabilidad) al modelo y por ende mejorando el ajuste.
+
+
+```{r promedios, echo=FALSE}
+
+id <- c("tesla_imp","rf_imp","sp")
+
+model <- assets_imp %>% 
+         group_by(month=floor_date(date, "month")) %>%
+         summarize_at(id,mean) %>% 
+         mutate(er = tesla_imp - rf_imp,
+                rp = sp - rf_imp )
+
+
+```
+
+
+## Modelo: Implementación
+
+```{r model, echo=FALSE}
+
+regression <- lm(er ~ rp, model)
+
+out <- summary(regression)
+
+beta <- coef(regression)
+
+c_i <- confint(regression)
+
+
+```
+
+
+### Visualización
+
+```{r vis_model, echo=FALSE }
+
+regression %>% ggplot(aes(x = rp, y = er)) +
+              geom_point(col = "#79BC42") +
+              stat_smooth(method = "lm") +
+              theme_pro() +
+              geom_text(aes(x=0.006,y=0.04),
+            label=paste("R^2: ", signif(out$r.squared,4)), 
+            size =5,
+            col = "#531F7E") +
+              labs(title = "TESLA - S$P 500 CAPM",
+                   subtitle = paste("Beta: ", signif(beta[2],3)),
+                   caption = paste("alpha: ", signif(beta[1],4)),
+                   x = "S&P - 10Y Treasury",
+                   y = "TESLA - 10Y Treasury") 
+
+```
+
+### Resultados
+
+
+```{r result, echo=FALSE}
+
+pander(tidy(regression), "Estimación puntual")
+
+pander(signif(c_i,4), "Estimación por regiones" )
+
+
+```
+
+### Discusión: ¿Qué hacer con los oultliers?
+
+Como podemos apreciar en la visualización del modelo hay ocasiones en las que podemos encontrar observaciones atípicas que pueden afectar en mayor o menos medida el ajuste del modelo. El que hacer con ellos es un gran tema de estudio así como el del tratamiento de datos faltantes.
+
+
+#### Reto
+
+  + Retira el outlier del DF "modelo" y cuelve a ajustar el modelo de regresión. Reporta:
+      + Visulización (Con r^2)
+      + REsultados del modelo
+      + Tip: usa dplyr::filter y el operador "distinto de" !=
+
+# Bibliografía
+  
+  1. [Investopedia](https://www.investopedia.com/terms/c/capm.asp)
+  2. [Wikipedia](https://es.wikipedia.org/wiki/Modelo_de_valoraci%C3%B3n_de_activos_financieros)
+  3. [StackOverflow](https://stackoverflow.com/questions/20075822/right-way-to-use-lm-in-r)
