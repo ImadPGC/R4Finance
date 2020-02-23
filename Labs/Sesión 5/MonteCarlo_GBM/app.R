@@ -264,21 +264,16 @@ server <- function(input, output) {
             # Histogram ---------------------------------------------------------------
             
             sim %>% 
-              ggplot(aes(x = Price)) +
+              ggplot(aes(x = signif(Price,5))) +
               geom_histogram( aes(y = ..density..),binwidth = bw, size = 1,
                               fill = "#79BC42", col = "#531F7E", alpha=0.8) +
               geom_vline(xintercept = q5, size = 1) +
-              scale_x_continuous( breaks = seq(from=min(sim$Price), 
+              scale_x_continuous( breaks = signif(seq(from=min(sim$Price), 
                                                 to = max(sim$Price), 
-                                               length.out = 50 ))+
-              geom_text(aes(x= q5 + 25,
-                            y=0.1),
-                        label=paste("Median", signif(q5,5)), 
-                        size =5,
-                        col = "#531F7E")+
+                                               length.out = 10 )),4)+
               theme_pro() +
               labs( title = input$sym,
-                    subtitle = "Monte Carlo Price Simulation",
+                    subtitle = paste("Median", signif(q5,5)),
                     caption = paste("90% Confidence interval ", 
                                     "[$",
                                     signif(confidence_interval[1],5),
