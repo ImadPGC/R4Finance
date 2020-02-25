@@ -1,6 +1,6 @@
-# Variables Basics --------------------------------------------------------
+# Variable Basics --------------------------------------------------------
 
-# Declara una Variable
+# Declara una Variable y operaciones
 
 a <- 2
 
@@ -50,6 +50,8 @@ f3 <- seq(from = 1, to = 100, by = 5)
 
 f4 <- seq(from = 1, to = 100, length.out = 13)
 
+seq(from = as.Date("2019-01-01"), to = as.Date("2020-01-01"), by = "weeks")
+
 
 # Data Frames Y Listas -------------------------------------------------------------
 
@@ -73,7 +75,7 @@ df[2,3]
 
 colnames(df)
 
-#df$
+df$
   
 # Listas
 
@@ -87,26 +89,26 @@ l1[["a"]]
 
 l1[[2]][3,2]
 
-#li$
+li$
   
 
 # For, If, functions ------------------------------------------------------
 
 # Ciclos for, if
   
-for (i in 1:3) {
-  
-  if(i == 1){
-    
-    print(paste("Arriba Markovitz",i))
- 
-  } else {
-    
-      print(paste("Ganarle al mercado es una observaciÃ³n de una v.a",i))
-    }
-  
-}
+x <- 1:6
 
+for (i in 1:8) {
+  
+  if(i == 1){ 
+  print(paste(1+i, "Hola"))
+  
+  }else{
+    print(paste(1+i, "Adios"))
+    
+  }
+
+  }
 
 # Funciones
 
@@ -129,7 +131,7 @@ imprimir_nombre()
 
 args(imprimir_nombre)
 
-imprimir_nombre(nombre = "Juliana Gudiñoo",
+imprimir_nombre(nombre = "Juliana Gudi?oo",
                 semestre = 1)
 
 
@@ -140,8 +142,8 @@ imprimir_nombre(semestre=7,
 
 
 # Reto
-# Inserta una seccióm
-# Desarrolla una función llamada VP que calcule el valor presente 
+# Inserta una secci?m
+# Desarrolla una funci?n llamada VP que calcule el valor presente 
 # Que tome un vector de flujos (anuales)
-# Una tasa de interés (efectiva anual)
-# Y devuelva el valor presente del vecto de flujos
+# Una tasa de inter?s (efectiva anual)
+# Y devuelva el valor presente del vector de flujos

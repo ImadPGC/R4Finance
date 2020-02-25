@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582596720710.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3247513293",
+    "id" : "3FDB51FF",
+    "lastKnownWriteTime" : 1582602804,
+    "last_content_update" : 1582602804133,
+    "path" : "~/R4Finance/Labs/session_5/app.R",
+    "project_path" : "Labs/session_5/app.R",
+    "properties" : {
+        "cursorPosition" : "16,25",
+        "scrollLine" : "13"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,5 +1,4 @@
 # Librerias ---------------------------------------------------------------
-
 library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
@@ -13,8 +12,6 @@ library(lubridate)
 library(scales)
 library(DT)
 library(readxl)
-
-
 # Import -------------------------------------------------------------------
 
 tickers <- read_excel("~/R4Finance/data/tickers.xlsx")
