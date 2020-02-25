@@ -12,7 +12,7 @@ library(lubridate)
 library(scales)
 library(DT)
 library(readxl)
-rethinking::map
+
 # Import -------------------------------------------------------------------
 
 tickers <- read_excel(here::here('data', 'tickers.xlsx'))
