@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3247513293",
+    "hash" : "3746545460",
     "id" : "3FDB51FF",
-    "lastKnownWriteTime" : 1582602804,
-    "last_content_update" : 1582602804133,
+    "lastKnownWriteTime" : 1582604078,
+    "last_content_update" : 1582604078820,
     "path" : "~/R4Finance/Labs/session_5/app.R",
     "project_path" : "Labs/session_5/app.R",
     "properties" : {
-        "cursorPosition" : "16,25",
-        "scrollLine" : "13"
+        "cursorPosition" : "80,32",
+        "scrollLine" : "66"
     },
     "read_only" : false,
     "read_only_alternatives" : [
