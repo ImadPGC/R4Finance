@@ -14,7 +14,7 @@ library(DT)
 library(readxl)
 # Import -------------------------------------------------------------------
 
-tickers <- read_excel("data/tickers.xlsx")
+tickers <- read_excel(here::here('data', 'tickers.xlsx'))
 
 # Tema --------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ ui <- dashboardPagePlus(
                             fluidPage(
                               
                               fluidRow(
-                                withMathJax(includeMarkdown("/Labs/session_5/include.Rmd"))
+                                withMathJax(includeMarkdown("include.Rmd"))
                               )
                             )
                     ),
@@ -93,7 +93,7 @@ ui <- dashboardPagePlus(
                                          ),
                                 tabPanel("Dates", dateRangeInput("date", 
                                                                  "Insert Time Period to analyse",
-                                                                 start = Sys.Date()-250,
+                                                                 start = Sys.Date() - 250,
                                                                  end = Sys.Date()))
                             )
                             
@@ -150,8 +150,8 @@ server <- function(input, output) {
         
         import() %>% ggplot(aes(x = date, y = adjusted)) +
                     geom_line( col = "#531F7E") +
-                    theme_pro()+
-                    scale_y_continuous(labels = dollar_format(prefix = "$"))+
+                    theme_pro() +
+                    scale_y_continuous(labels = dollar_format(prefix = "$")) +
                     labs(title = paste(input$sym, " Time Series",
                                        x = "Date",
                                        y = "Price"))
@@ -162,7 +162,7 @@ server <- function(input, output) {
     
     output$s0 <- renderValueBox({
       valueBox(
-        icon=icon("cloudsmith"),
+        icon = icon("cloudsmith"),
         color = "green",
         "S0",
         paste("$", signif(import()$adjusted[1],5))
@@ -171,7 +171,7 @@ server <- function(input, output) {
     
     output$mu <- renderValueBox({
       valueBox(
-        icon=icon("cloudsmith"),
+        icon = icon("cloudsmith"),
         color = "orange",
         "Mean",
         signif(mean(import()$return),5)
@@ -183,7 +183,7 @@ server <- function(input, output) {
       valueBox(
         "Sigma",
         color = "yellow",
-        icon=icon("cloudsmith"),
+        icon = icon("cloudsmith"),
         signif(sd(import()$return),5)
       )
     })
@@ -194,17 +194,17 @@ server <- function(input, output) {
       # wrap the loop execution in withProgress
       withProgress(
         
-        message='Please wait',
-        detail='Running Model...',
-        value=0, {
+        message = 'Please wait',
+        detail = 'Running Model...',
+        value = 0, {
           
           n <- 5
           
           incProgress(1/n, detail = paste("Simulating Trayectories")) #1
           
-          sim <-GBM(N = input$h,
+          sim <- GBM(N = input$h,
                     M = 1000,
-                    x0=import()$adjusted[1],
+                    x0 = import()$adjusted[1],
                     theta = mean(import()$return),
                     sigma = sd(import()$return)
           )
@@ -227,7 +227,7 @@ server <- function(input, output) {
               geom_line() +
               theme_pro() +
               theme(legend.position = "none",
-                    axis.text.x = element_blank())+
+                    axis.text.x = element_blank()) +
               labs(title = paste("Monte Carlo Stock ", input$sym, " Price Simulation"),
                    subtitle = "Geometric Brownian Motion",
                    caption = paste("1000 Trayectories", input$h, " - 252 Day Horizon"),
@@ -245,16 +245,16 @@ server <- function(input, output) {
             
             sim <- sim %>% 
               filter(id == input$h) %>% 
-              dplyr::select(-id)%>% 
+              dplyr::select(-id) %>% 
               gather("Sim", "Price") 
             
             
             r <- range(sim$Price)
-            bw <- (r[2]-r[1])/sqrt(nrow(sim))
+            bw <- (r[2] - r[1])/sqrt(nrow(sim))
             
             confidence_interval <- quantile( x = sim$Price, 
                                              probs = c(.025, 0.975))
-            upside_prob <- sum(sim$Price>=import()$adjusted[1])/nrow(sim)
+            upside_prob <- sum(sim$Price >= import()$adjusted[1])/nrow(sim)
             q5 <- mean(sim$Price)
             
             
