@@ -4,6 +4,7 @@ author: ""
 date: ""
 output: html_document
   mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+runtime: shiny
 ---
 
 ### Simulación via Browniano Geométrico
