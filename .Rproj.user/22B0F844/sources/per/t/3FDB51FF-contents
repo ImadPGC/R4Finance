@@ -14,8 +14,7 @@ library(DT)
 library(readxl)
 # Import -------------------------------------------------------------------
 
-setwd("~/R4Finance/data")
-tickers <- read_excel("tickers.xlsx")
+tickers <- read_excel("data/tickers.xlsx")
 
 # Tema --------------------------------------------------------------------
 
@@ -78,7 +77,7 @@ ui <- dashboardPagePlus(
                             fluidPage(
                               
                               fluidRow(
-                                withMathJax(includeMarkdown("~/R4Finance/Labs/session_5/include.Rmd"))
+                                withMathJax(includeMarkdown("/Labs/session_5/include.Rmd"))
                               )
                             )
                     ),
