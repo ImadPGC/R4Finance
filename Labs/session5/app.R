@@ -12,9 +12,10 @@ library(lubridate)
 library(scales)
 library(DT)
 library(readxl)
+library(here)
 
 # Import -------------------------------------------------------------------
-tickers <- read_excel(here::here('data', 'tickers.xlsx'))
+tickers <- read_excel(here('tickers.xlsx'))
 # Tema --------------------------------------------------------------------
 
 theme_pro <- function(){
