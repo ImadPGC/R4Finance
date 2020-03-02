@@ -1,0 +1,26 @@
+---
+title: "Sesión 5"
+author: "Gibran fuckin putísimo Peniche"
+date: "`r format(Sys.Date(), '%d de %B, %Y')`"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+runtime: shiny
+---
+
+### Simulation via Geometric Brownian Motion
+
+In the context of *Asset Pricing* and in particular **Option Valuation**, simulating possible price trayectories for certain asset is done to price a derivative contract dependent on such asset. In order to do the latter, we must stablish a functional form for the asset price.
+
+One of the most popular tools to do so is the *Geometric Brownian Motion*. It's important to notice these by nature is not a **time series model** but a **stochastics differential equation**. 
+
+Suposing log-returns are reasonably log-normal distributed we define the price trayectory function as follows: $S_t = S_0 e^{\{(\mu-\frac{1}{2}\sigma^2)dt+\sigma W_t \}}$, where:
+
+  + $\mu$ its called the process drift
+  + $\sigma$ its the volatility of the process
+  + $dt$ its the step
+  + $W_t$ its the process innovations where $W_t \sim WN(0,\sigma^2)$
+    
+The purpose of this dasboard its to be a visual interface where the user can visualize, a proxy **price distribution** for a publicly traded asset from the market, with the posibility to decide the simulation horizon. 
+
+Although we are going to be working inside RStudio, thi app is already avaible online [here](https://jgpeniche.shinyapps.io/session_5/).
