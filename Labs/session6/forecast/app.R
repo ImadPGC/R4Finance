@@ -17,14 +17,12 @@ library(forecast)
 
 # Theme -------------------------------------------------------------------
 
-source(here::here('helpers', 'helpers.R'))
+source(here:here('helpers','helpers.R'))
 
 
 # Data --------------------------------------------------------------------
 
-sales  <- readr::read_csv(here::here(
-                                     'data',
-                                     'apple_rev.csv'))%>% 
+sales  <- readr::read_csv(here::here('data','apple_rev.csv'))%>% 
           mutate(date =lubridate::mdy(date),
                  sales = as.numeric(sales)) %>% 
          as_data_frame()
