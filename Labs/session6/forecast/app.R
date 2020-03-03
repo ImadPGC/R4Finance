@@ -11,13 +11,12 @@ library(lubridate)
 library(tidybayes)
 library(broom)
 library(reshape2)
-library(mctest)
 library(here)
 library(forecast)
 
 # Theme -------------------------------------------------------------------
 
-source(here:here('helpers','helpers.R'))
+source(here::here('helpers','helpers.R'))
 
 
 # Data --------------------------------------------------------------------
@@ -70,7 +69,15 @@ ui <- fluidPage(
 
         mainPanel(
            tabsetPanel(
-               tabPanel('The Problem'),
+               tabPanel('The Problem',
+                        fluidPage(
+                           fluidRow(
+                                #MathJAx inluye rendering de LaTeX
+                                withMathJax(includeMarkdown("include.Rmd"))
+                            )
+                        )#Termina FluiPage
+                        
+                        ),
                tabPanel('Time Series',
                         plotOutput('ts')),
                tabPanel('Regression',
