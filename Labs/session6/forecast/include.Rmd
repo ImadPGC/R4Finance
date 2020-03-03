@@ -1,0 +1,22 @@
+---
+title: "Sesión 5"
+author: "Gibran fuckin putísimo Peniche"
+date: "`r format(Sys.Date(), '%d de %B, %Y')`"
+output: 
+  html_document:
+    mathjax: "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+runtime: shiny
+---
+
+### Sales Forecast & Model Selection
+
+In the context of *Finantial Analysis* in order to perform **Prospective Analysis** we need to estimate the company *Revenue* in order to build prospective Finantial Statements parting from the Income Statement, ending in the Cash Flos Statement in order to ultimatly apply DCF (for example) and price the company's stock.
+
+In this App we are worried  about comparing different statistical approaches to the problem. In our case we are goingo to fit and analyse 4 models: 
+    
+  + Linear Regression
+  + Bayesian Lineal Regression
+  + ARIMAX models
+  + Space State Models
+  
+Additionaly we are going to explore best practices in model training & learn model selection criteria when the $R^2$ statistics is not meaninfull among models.
