@@ -1,0 +1,20 @@
+---
+title: "Timer"
+author: "R for Finance ITAM"
+date: "3/2/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(countdown)
+
+countdown(1L)
+
+```
+
