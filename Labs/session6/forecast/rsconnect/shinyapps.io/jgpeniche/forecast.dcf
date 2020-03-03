@@ -5,6 +5,6 @@ account: jgpeniche
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1890955
-bundleId: 2845196
+bundleId: 2845652
 url: https://jgpeniche.shinyapps.io/forecast/
-when: 1583186987.66929
+when: 1583199067.22231
