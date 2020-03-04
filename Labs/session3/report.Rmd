@@ -13,7 +13,7 @@ output:
 editor_options: 
   chunk_output_type: console
 mainfont: Bookman Old Style
-abstract: "This is my abstract."
+abstract: "Statatistical treatment for data in fitting the CAPM"
 ---
 
 ```{r setup, include=FALSE}
@@ -74,7 +74,7 @@ theme_pro <- function(){
 \pagestyle{fancy}
 \addtolength{\headheight}{1.0cm}
 \pagestyle{fancyplain}
-\rhead{\includegraphics[height=1cm]{C:/Users/jgpen/Documents/R4Finance/imgs/itam.png}}
+\rhead{\includegraphics[height=1cm]{`r here::here('imgs', 'itam.png')`}}
 
 ```{r set_up, include = FALSE}
 
@@ -87,6 +87,7 @@ library(lubridate)
 library(readxl)
 library(naniar)
 library(pander)
+library(here)
 library(egg)
 
 ```
@@ -132,7 +133,7 @@ Si el modelo es correcto la interssión debería ser cero, generalmente esto no 
  
 ```{r import, echo=FALSE}
 
-tesla <- as_data_frame(read_csv("C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/data/TSLA.csv")) %>% 
+tesla <- as_data_frame(read_csv(here('data','TSLA.csv'))) %>% 
          select(Date, "Adj Close")
 
 colnames(tesla) <- c("date", "tesla")
@@ -144,7 +145,7 @@ tesla <- tesla %>%
                       mutate_fun =  dailyReturn,
                       col_rename = "tesla") 
 
-sp <- as_data_frame(read_csv("C:/Users/jgpen/Documents/GitHub/CursoR_Finanzas/data/^GSPC.csv")) %>% 
+sp <- as_data_frame(read_csv(here('data', "^GSPC.csv")) )%>% 
          select(Date, "Adj Close")
 
 colnames(sp) <- c("date", "sp")
@@ -168,7 +169,7 @@ colnames(rf) <- c("date", "rf")
 
 rf <- rf %>% 
        mutate(date = ymd(date),
-              rf = as.numeric(rf)/1200)
+              rf = as.numeric(rf)/100)
 
 assets <- left_join(tesla, sp, by = "date")
 
@@ -208,6 +209,7 @@ ggarrange(miss1,miss2, nrow = 2)
 Creamos "Datos Nabulares" para rastrear los datos faltantes y las imputaciones e imputamos por combinación líneal.
 
 ```{r nab, echo=FALSE}
+
 
 assets_imp <- add_label_missings(assets) %>% 
              mutate(tesla_imp = na.approx(tesla),
@@ -295,7 +297,7 @@ Como podemos apreciar en la visualización del modelo hay ocasiones en las que p
 
 #### Reto
 
-  + Retira el outlier del DF "modelo" y cuelve a ajustar el modelo de regresión. Reporta:
+  + Retira el outlier del DF "modelo" y vuelve a ajustar el modelo de regresión. Reporta:
       + Visulización (Con r^2)
       + REsultados del modelo
       + Tip: usa dplyr::filter y el operador "distinto de" !=
