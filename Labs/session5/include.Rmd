@@ -23,4 +23,4 @@ Suposing log-returns are reasonably log-normal distributed we define the price t
     
 The purpose of this dasboard its to be a visual interface where the user can visualize, a proxy **price distribution** for a publicly traded asset from the market, with the posibility to decide the simulation horizon. 
 
-Although we are going to be working inside RStudio, thi app is already avaible online [here](https://jgpeniche.shinyapps.io/session_5/).
+Although we are going to be working inside RStudio, the app is already avaible online [here](https://jgpeniche.shinyapps.io/session_5/).
