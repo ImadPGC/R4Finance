@@ -5,6 +5,6 @@ account: jgpeniche
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1858000
-bundleId: 2845661
+bundleId: 2845692
 url: https://jgpeniche.shinyapps.io/session_5/
-when: 1583199145.80765
+when: 1583200206.97446
