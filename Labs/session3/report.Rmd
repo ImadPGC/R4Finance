@@ -20,6 +20,7 @@ abstract: "Statatistical treatment for data in fitting the CAPM"
 knitr::opts_chunk$set(echo = TRUE) # Esta opci??n hace que por default se imprima el c??digo
 knitr::opts_chunk$set(warning = FALSE) # Estas dos opciones evitan que se impriman mensajes a la hora de generar el pdf
 knitr::opts_chunk$set(message= FALSE)
+knitr::opts_chunk$set(verbose = FALSE)
 
 #Estas L??neas sirven para ajustar tama??o y orientaci??n de las gr??ficas
 knitr::opts_chunk$set(fig.width=8)
@@ -62,7 +63,7 @@ theme_pro <- function(){
 } 
 ```
 
-\thispagestyle{empty}
+\thispagestyle{empty} 
 \pagebreak
 \newpage
 \pagenumbering{arabic} 
@@ -96,9 +97,9 @@ library(egg)
 # Riesgo de Mercado medido por el CAPM
 ## El problema
 
-En el contexto de **Asset Pricing** nos encontramos con el problema de *estimar* el precio (en terminos de su retorno así como el riesgo asociado a este retorno) de los activos riesgosos. 
+En el contexto de **Asset Pricing** nos encontramos con el problema de *estimar* el precio (en terminos de su retorno, así como el riesgo asociado a este retorno) de los activos riesgosos. 
 
-Una manera de tratar este problema lo propusieron *Jack Treyno* (1961, 1962), *William F. Sharpe* (1964) y *John Lintner* (1965) partiendo de un problema de maximización/minimización de la razón retorno - riesgo para un portafolio de activos riesgosos.
+Una manera de tratar este problema lo propusieron *Jack TreynoR* (1961, 1962), *William F. Sharpe* (1964) y *John Lintner* (1965) partiendo de un problema de maximización/minimización de la razón retorno - riesgo para un portafolio de activos riesgosos.
 
 Específicamente el CAPM es una herramienta que pretende medir la relación entre el *retorno esperado* de un activo y su relación con el *riesgo sistemático*.
 
@@ -110,22 +111,22 @@ En este documento estudiaremos los retos que implica la implementación de este 
 
 En un portafolio de activos riesgosos, al aumentar el no. de activos, el riesgo instrínseco que aporta cada activo, medido por la desviación estándar, tiende a anularse. Es decir, para un portafolio bien diversificado $\sigma_p \rightarrow 0$. Sin embargo hay unidades residuales de riesgo no atribuibles a los activos sino al mercado que permanancen latentes aún ante una diversificación "completa". ¿Cómo medimos este riesgo residual?
 
-Muy a grandes rasgos, si consideramos que el retorno de los activos se puede explicar mediante el modelo de un solo factor, con este siendo el retorno del mercado al resolver el problema de maximización: $max\{ r_p\} \frac{rp - rf}{\sigma_p} = sharpe$ $ratio$ s.a $\sigma_p > 0$ encontraremos no solo que la combinación de activos que maximiza las unidades de retorno en exceso de una unidad de riesgo es de hecho el portafolio de mercado, si no que, el número que mide el riesgo sistemático existe y se le conoce como la beta ($\beta$) del activo.
+Muy a grande rasgos, si consideramos que el retorno de los activos se puede explicar mediante el modelo de un solo factor, con este siendo el retorno del mercado, al resolver el problema de maximización: $max\{ r_p\} \frac{rp - rf}{\sigma_p} = sharpe$ $ratio$ s.a $\sigma_p > 0$ encontraremos no solo que la combinación de activos que maximiza las unidades de retorno en exceso de una unidad de riesgo es de hecho el portafolio de mercado, si no que, el número que mide el riesgo sistemático existe y se le conoce como la beta ($\beta$) del activo.
 
-Por la manera en la que se plantea el problema este número coincide con la beta de ua reggressión líneal entre el mercado, la tasa libre de riesgo y el activo al que queremos ponerle precio. Esta relación tiene la siguiente forma $r_a = r_f + \beta_a[r_m - r_f]$.
+Por la manera en la que se plantea el problema este número coincide con la beta de ua reggresión líneal entre el mercado, la tasa libre de riesgo y el activo al que queremos ponerle precio. Esta relación tiene la siguiente forma $r_a = r_f + \beta_a[r_m - r_f]$.
 
 # Implementación
 
 Para estimar el modelo utilizaremos el modelo de mercado propuesto por Famma & MacBeth de la forma $r_a - r_f = \beta_a[r_m-r_f]$ y ajustaremos un modelo de regresión normal simple sobre estos datos.
 
-Si el modelo es correcto la interssión debería ser cero, generalmente esto no ocurre y a estas desviaciones del CAPM se le conoce como la $\alpha$ del activo y son muy utilizadas como mpetricas de desempeño para los administradores de activos.
+Si el modelo es correcto la intersección debería ser *estadísiticamente distinta* decero, generalmente esto no ocurre e implican que el CAPM en general no es cierte. Con respecto a este problema hay una extensa literatura sobre el poqué de este fenómeno y en que casos aplica el mismo.
 
 ## Detalles Técnicos
 
-  1. Para la implementación de este modelo como propuesto por Famma & MacBeth partimos de 5 años de datos de precios diarios.
+  1. Para la implementación de este modelo, como propusieron Famma & MacBeth partimos de 5 años de datos de precios diarios.
   2. Usaremos precios diarios ajustados (por dividendos)
   3. Generalmente va a ocurrir que el mundo real es bastante feo y nos vamos a encontrar con información incompleta debemos darle un tratamientoe especial a estos datos.
-  4. Debe haber infromación completa para todo el periodo del activo y el mercado.
+  4. Debe haber información completa para todo el periodo del activo y el mercado.
   5. La tasa libre de riesgo debe ser de hecho libre de riesgo y debe corresponder al horizonte de inversión.
 
 ### Resumen de Datos
@@ -183,7 +184,7 @@ Resumen datos con periodicidad diaria
 
 pander(summary(assets), "Resumen de datos 1")
 
-pander(str(assets), "resumen de datos 2")
+pander(glimpse(assets), "resumen de datos 2")
 
 ```
 
