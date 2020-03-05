@@ -1,6 +1,6 @@
 # Variable Basics --------------------------------------------------------
 
-# Declara una Variable y operaciones
+# Declarar una Variable y operaciones básicas
 
 a <- 2
 
@@ -12,7 +12,7 @@ a/b
 
 a*b
 
-# Crear un vector numérico c()
+# Crear un vector numérico c() y operaciones vectorizadas
 
 d <- c(1,2,3,4,5,6,7,8)
 
@@ -28,7 +28,7 @@ d*d1
 
 f <- c("a", "b", "c")
 
-# Crear un vector boolean c()
+# Crear un vector boolean c() y operaciones básicas
 
 f1 <- c(TRUE,TRUE, FALSE, FALSE)
 
@@ -43,6 +43,7 @@ sum(f1)
 # Crear un vector combinado c()
 
 f2 <- c(1, "TRUE", FALSE)
+class(f2)
 
 # Crear un vector numérico sando seq
 
@@ -50,8 +51,8 @@ f3 <- seq(from = 1, to = 100, by = 5)
 
 f4 <- seq(from = 1, to = 100, length.out = 13)
 
-seq(from = as.Date("2019-01-01"), to = as.Date("2020-01-01"), by = "weeks")
-
+dates <- seq(from = as.Date("2019-01-01"), to = as.Date("2020-01-01"), by = "weeks")
+class(dates)
 
 # Data Frames Y Listas -------------------------------------------------------------
 
@@ -73,9 +74,9 @@ df[1,]
 df[,1]
 df[2,3]
 
-colnames(df)
+colnames(df) <- c('normal','t_student', 'exp')
 
-df$
+df
   
 # Listas
 
@@ -89,13 +90,15 @@ l1[["a"]]
 
 l1[[2]][3,2]
 
-li$
+#li$
   
 
 # For, If, functions ------------------------------------------------------
 
 # Ciclos for, if
-  
+
+#Otra amnera de declarar una secuencia
+
 x <- 1:6
 
 for (i in 1:8) {
@@ -112,11 +115,13 @@ for (i in 1:8) {
 
 # Funciones
 
-imprimir_nombre <- function(nombre = "Dirección financiera", semestre = 6){
+# Argumentos por nombre o por orden
+imprimir_nombre <- function(nombre = "Warren buffet", semestre = 6){
   
   if( class(nombre) != "character"){
     
-    print("Ingresa una String")
+    # Programamos un error
+    print("ERROR: Ingresa una String")
      
      } else {
     
@@ -131,7 +136,7 @@ imprimir_nombre()
 
 args(imprimir_nombre)
 
-imprimir_nombre(nombre = "Juliana Gudi?oo",
+imprimir_nombre(nombre = "Donald Trump",
                 semestre = 1)
 
 
@@ -139,11 +144,10 @@ imprimir_nombre(semestre=7,
                 nombre = 2)
 
 
-
-
 # Reto
-# Inserta una secci?m
-# Desarrolla una funci?n llamada VP que calcule el valor presente 
+# Inserta una sección
+# Desarrolla una función llamada VP que calcule el valor presente 
 # Que tome un vector de flujos (anuales)
-# Una tasa de inter?s (efectiva anual)
+# Una tasa de interés (efectiva anual)
 # Y devuelva el valor presente del vector de flujos
+# La temporalidad es el largo del vector de flujos. Hint usa length()
