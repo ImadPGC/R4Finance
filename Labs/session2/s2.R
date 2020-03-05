@@ -1,36 +1,42 @@
 # Libraries ---------------------------------------------------------------
-library(readxl)
-library(scales)
-library(tidyverse)
-library(tidyquant)
-library(dplyr)
-library(xts)
-library(lubridate)
-library(quantmod)
-library(PortfolioAnalytics)
+library(tidyverse) #Tidy data & plots
+library(dplyr) #Sintaxis tipo SQL
+library(readxl) #Leer excell
+library(here) #Encontrar archivos
+library(scales) #Formatear gráficas
+library(quantmod) #Importar atos finacieros
+library(PortfolioAnalytics) #Operar datos financieros
+library(tidyquant) #Importar datos financieros fácil y en formato tidy
+library(xts) #Operar series de tiempo
+library(lubridate) #Ya esta incluida en TidyVerse, trabajar con fechas fácil
+
 
 # Import ------------------------------------------------------------------
 
+#read_csv
 csv_tesla <- 
 
+#read_excel
 sales_excell <- 
 
+#Reto importar "TSLA", hint: ?getSymbols (Función de quantmod)
+#Importar pib mexicano de la FRED
 hot_stock <- 
-
+mxgdp <- 
 
 # Resumenes ---------------------------------------------------------------
-
+#Análisis Exploratorio de datos 101
 summary(csv_tesla)
-
+str(csv_tesla)
 glimpse(csv_tesla)
 
 summary(sales_excell)
-
 glimpse(sales_excell)
 
 
 # Retornos ----------------------------------------------------------------
 
+#Problemas de compatibilidad entre objetos
 hot_stock$returns <- as.vector(CalculateReturns(xts()))
 
 # Verbos Dplyr ------------------------------------------------------------
@@ -41,33 +47,32 @@ hot_stock$returns <- as.vector(CalculateReturns(xts()))
 
 # Group_by & Summarize para resumenes
 
-sales_excell %>% filter(-ok) %>% 
+sales_excell %>% filter() %>% 
                  mutate() %>% 
-                 group_by() %>% 
                  summarize()
 
 # Finance Tidy ------------------------------------------------------------
-
-stock_prices <- c("AAPL", "GOOG", "NFLX") %>%
-  tq_get(get  = "stock.prices",
-         from = "2010-01-01",
+#Devuelve un DF largo
+stock_prices_long <- c("AAPL", "GOOG", "NFLX") %>% #Especificamos los activos
+  tq_get(get  = "stock.prices", #Es diferente siq ueremos tasas de interés
+         from = "2010-01-01",  
          to   = "2015-12-31") 
 
-stock_prices1 <- c("AAPL", "GOOG", "NFLX") %>%
-  tq_get(get  = "stock.prices",
-         from = "2010-01-01",
-         to   = "2015-12-31") %>% 
-  tq_transmute(select     = adjusted, 
-               mutate_fun = periodReturn, 
-               period     = "monthly", 
-               col_rename = "return")
+#Transformar DF wide
+stock_prices_wide <- c("AAPL", "GOOG", "NFLX") %>% #Especificamos los activos
+  tq_get(get  = "stock.prices", #Es diferente siq ueremos tasas de interés
+         from = "2010-01-01",  
+         to   = "2015-12-31")%>% 
+  dplyr::select(date, symbol, adjusted) %>% 
+  spread(symbol,adjusted)
 
+#Eliminamos los problemas de compatibilidad
 Ra <- c("AAPL", "GOOG", "NFLX") %>%
   tq_get(get  = "stock.prices",
          from = "2010-01-01",
          to   = "2015-12-31") %>%
   group_by(symbol) %>%
-  tq_transmute(select     = adjusted, 
+  tq_transmute(select     = adjusted, #Transmute elimina columan adjusted
                mutate_fun = periodReturn, 
                period     = "monthly", 
                col_rename = "Ra")
@@ -80,7 +85,10 @@ Rb <- "XLK" %>%
                mutate_fun = periodReturn, 
                period     = "monthly", 
                col_rename = "Rb")
-
+#Set Operation
+#right_join
+#anti_join
+#full_join
 RaRb <- left_join(Ra,Rb,by = c("date" = "date"))
 
 stocks_capm <-  RaRb %>%
@@ -95,22 +103,22 @@ tesla <- full_join(csv_tesla,sales_excell, by = "Date")
 
 # Data Vis ----------------------------------------------------------------
 
-tesla %>% ggplot(aes()) + 
-          geom_line() +
-          geom_point() +
-          labs() +
-          theme_dark()
+tesla %>% ggplot(aes()) + #Escificar que gráfias
+          geom_line() +  #Tipo de gráfica
+          geom_point() + #Debe ser compatible
+          labs() 
 
 tesla %>% ggplot(aes()) + 
   geom_line() +
   geom_point() +
   labs() +
-  theme_dark()
+  theme_dark() #Cambiar tema
   
-stock_prices %>%  ggplot( aes(x = 1, y = adjusted)) +
+#Exploratorio de datos 102
+stock_prices_long %>%  ggplot( aes(x = 1, y = adjusted)) +#Creamos dummy variable
        geom_boxplot() +
-       coord_flip() +
-       facet_wrap(.~ symbol, scales = "free") +
+       coord_flip() + #Volteamos ejes, pero solo visualmente
+       facet_wrap(.~ symbol, scales = "free") + #Creamos un box plor para cada simbolo
        theme_light() +
        theme(
          axis.text.y = element_blank()
@@ -121,7 +129,7 @@ stock_prices %>%  ggplot( aes(x = 1, y = adjusted)) +
        y = "Price ",
        caption = "R for finance ITAM")
 
-stock_prices %>% ggplot(aes(x = date, y = adjusted, group = symbol )) +
+stock_prices_long %>% ggplot(aes(x = date, y = adjusted, group = symbol )) +
                  geom_line( aes(col = symbol)) +
                  theme_minimal() +
                  labs(title = "Time Series",
@@ -169,8 +177,29 @@ theme_pro <- function(){
 
 # Reto --------------------------------------------------------------------
 
-# Realiza un Histograma de los retornos en el objeto stock prices1
-# para tesla
-# Los valores en el eje x deben tener el simbolo %
+# Decarga los precio de los ETF's para el IPC, S&P500, y el MSCI
+# Calcula sus retornos
+# Realiza un histograma de sus retornos con densidad en vez de conteo
+# HINT1: Busca en google 'Density Histogram ggplot2'
+# Hint2: Usa un DF largo (Lo genera tq por default)
+# Los valores en el eje y deben tener el simbolo %
+# Hint busca add % to y axix values ggplot2
 # Usa el theme_pro() que les regalé
+
+
+# Reto 2 ------------------------------------------------------------------
+data("coronavirus")
+covid19 <- coronavirus
+
+#Usa glimpse para ver las variables que contiene tu df
+#Has un resumen de cuantos casos confirmados, muertes y curados ha habido a partir
+# de febrero para cada país
+# Hint: Usa groupb_by con las variables en cuestión y despues summarise y la función sum
+# con la variable cases
+# Usa filter para filtrar date mayores o iguales al 31 de enero 
+
+# Haz una gráfica de la evolución de los casos confirmados para méxico
+# HINT: usa filter con Country.Region junto con type
+## la Sintaxis para incluir dos condiciones en un mismo filter es cond1 && cond 2
+
 
