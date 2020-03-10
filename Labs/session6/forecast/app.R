@@ -7,31 +7,34 @@ library(scales)
 library(tidyquant)
 library(rstanarm)
 library(bsts)
+library(loo)
 library(lubridate)
 library(tidybayes)
 library(broom)
 library(reshape2)
 library(here)
 library(forecast)
+library(DT)
 
 # Theme -------------------------------------------------------------------
 
-source(here::here('helpers','helpers.R'))
+source('helpers/helpers.R')
 
 
 # Data --------------------------------------------------------------------
 
-sales  <- readr::read_csv(here::here('data','apple_rev.csv'))%>% 
+sales  <- readr::read_csv('data/apple_rev.csv')%>% 
           mutate(date =lubridate::mdy(date),
                  sales = as.numeric(sales)) %>% 
          as_data_frame()
 
 gdp <-  tq_get("ND000334Q", 
+               from = '2010/09/01',
               get = "economic.data") %>%    
-        dplyr::select(price) %>% 
+        dplyr::select(price)%>% 
         unlist()
 
-sales$gdp <- c(unlist(gdp[4:40]))
+sales$gdp <- gdp
 
 n <- nrow(sales)    
 
@@ -89,7 +92,7 @@ ui <- fluidPage(
                tabPanel('Space State Model',
                         plotOutput('ssm')),
                tabPanel('Model Comparison',
-                        'showdown')
+                        DTOutput('vs'))
            )
         )
     )
@@ -110,6 +113,7 @@ server <- function(input, output) {
              mutate( 
                  Group = case_when(Group <= input$train*n ~ 'train',
                                    TRUE ~ 'eval'))
+    
     })#Termina model
     
     output$ts <- renderPlot({
@@ -122,7 +126,7 @@ server <- function(input, output) {
         facet_wrap( variable ~. , scales = 'free') +
         scale_y_continuous(labels = scales::dollar_format(prefix = '$')) +
         scale_color_manual(values = c('#79BC42','#2C3744'))+
-        labs(title = 'GDp & Apple.Inc Revenue',
+        labs(title = 'GDP & Apple.Inc Revenue',
              x = 'Date',
              y = 'Sale')
         
@@ -161,6 +165,14 @@ server <- function(input, output) {
                         mutate(lm = aux$fit,
                          up_lm = aux$upr,
                          dn_lm = aux$lwr)
+                
+                
+                MAPE1 <- data_frame(actual = test$sales,
+                                    lm = pred1$lm) %>% 
+                    summarise(MAPE = mean(abs(actual-lm)/actual)) %>% 
+                    pull(MAPE)
+                
+                
                 
                 #Regression Plot
                 output$reg <- renderPlot({
@@ -230,6 +242,11 @@ server <- function(input, output) {
                         mutate(up_blm = aux[,2],
                                dn_blm = aux[,1])
                 
+                MAPE2 <- data_frame(actual = test$sales,
+                                    lm = pred2$blm) %>% 
+                    summarise(MAPE = mean(abs(actual-lm)/actual)) %>% 
+                    pull(MAPE)
+                
                 # Visulización del modelo
                 output$breg <- renderPlot({
                     
@@ -282,6 +299,11 @@ server <- function(input, output) {
                              up_arimax = aux$`Hi 95`,
                              dn_arimax = aux$`Lo 95`)
                 
+                MAPE3 <- data_frame(actual = test$sales,
+                                    lm = pred3$arimax) %>% 
+                    summarise(MAPE = mean(abs(actual-lm)/actual)) %>% 
+                    pull(MAPE)
+                
                 
                 # Visulización del modelo
                 output$arimax <- renderPlot({
@@ -314,7 +336,7 @@ server <- function(input, output) {
                 
                 #Modelo Espacio estado
                 ss <- AddLocalLinearTrend(list(), train$sales) #tendencia
-                ss <- AddSeasonal(ss, model()$sales, nseasons = 4) #Estacionalidad
+                ss <- AddSeasonal(ss, train$sales, nseasons = 4) #Estacionalidad
                
                 model4 <- bsts(train$sales ~ train$gdp,
                                    state.specification = ss,
@@ -337,14 +359,12 @@ server <- function(input, output) {
                                 dn_ssm = aux[['interval']][1,]
                               )
                 
-                ### Get the average coefficients when variables were selected (non-zero slopes)
-                coef4 <- cbind.data.frame(
-                         colMeans(model4$state.contributions[-(1:burn),"trend",]),
-                         colMeans(model4$state.contributions[-(1:burn),"regression",]),
-                         train$date)  
+                MAPE4 <- data_frame(actual = test$sales,
+                                    lm = pred4$ssm) %>% 
+                    summarise(MAPE = mean(abs(actual-lm)/actual)) %>% 
+                    pull(MAPE)
                 
-                names(model4) <- c("Trend", "Seasonality" ,"Regression", "Date")
-                
+        
                 
                 # Visulización del modelo
                 output$ssm <- renderPlot({
@@ -372,10 +392,29 @@ server <- function(input, output) {
                     
                 })#Termina output arimax
                 
+                output$vs <- renderDT({
+                    
+                    results <- data_frame('Metric' = c('MAPE', 'Log Likelihood', 'BIC'),
+                                          "Linear Regression" = c(paste(signif(MAPE1,4)*100,'%'),
+                                                                  signif(logLik(model1),5),
+                                                                  signif(BIC(model1),5)),
+                                          "Bayesian Regression" = c(paste(signif(MAPE2,4)*100,'%'),
+                                                                    signif(sum(colMeans(rstanarm::log_lik(model2))),5),
+                                                                    signif(log(nrow(train))-2*sum(colMeans(rstanarm::log_lik(model2))),5)
+                                                                ),
+                                          "ARIMAX" = c(paste(signif(MAPE3,4)*100,'%'),
+                                                       signif(model3$loglik,5), 
+                                                       signif(model3$bic,5)),
+                                          'Space State Model' = c(paste(signif(MAPE4,4)*100,'%'), 
+                                                                  signif(mean(model4$log.likelihood),5), 
+                                                                  signif(log(nrow(train))-2*mean(model4$log.likelihood),5))
+                                          )#Termina Results
+                
+                    
+                })#Temina Render DT
                 
             })#termina with progress
     })#TerminaObserverEvent
-    
     
 }#Termina Server
 
