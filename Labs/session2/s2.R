@@ -9,7 +9,7 @@ library(PortfolioAnalytics) #Operar datos financieros
 library(tidyquant) #Importar datos financieros fácil y en formato tidy
 library(xts) #Operar series de tiempo
 library(lubridate) #Ya esta incluida en TidyVerse, trabajar con fechas fácil
-
+library(coronavirus) #Base de Datos
 
 # Import ------------------------------------------------------------------
 
@@ -54,13 +54,13 @@ sales_excell %>% filter() %>%
 # Finance Tidy ------------------------------------------------------------
 #Devuelve un DF largo
 stock_prices_long <- c("AAPL", "GOOG", "NFLX") %>% #Especificamos los activos
-  tq_get(get  = "stock.prices", #Es diferente siq ueremos tasas de interés
+  tq_get(get  = "stock.prices", #Es diferente si queremos tasas de interés
          from = "2010-01-01",  
          to   = "2015-12-31") 
 
 #Transformar DF wide
 stock_prices_wide <- c("AAPL", "GOOG", "NFLX") %>% #Especificamos los activos
-  tq_get(get  = "stock.prices", #Es diferente siq ueremos tasas de interés
+  tq_get(get  = "stock.prices", #Es diferente siqueremos tasas de interés
          from = "2010-01-01",  
          to   = "2015-12-31")%>% 
   dplyr::select(date, symbol, adjusted) %>% 
@@ -118,7 +118,7 @@ tesla %>% ggplot(aes()) +
 stock_prices_long %>%  ggplot( aes(x = 1, y = adjusted)) +#Creamos dummy variable
        geom_boxplot() +
        coord_flip() + #Volteamos ejes, pero solo visualmente
-       facet_wrap(.~ symbol, scales = "free") + #Creamos un box plor para cada simbolo
+       facet_wrap(.~ symbol, scales = "free") + #Creamos un box ploT para cada simbolo
        theme_light() +
        theme(
          axis.text.y = element_blank()
@@ -177,11 +177,13 @@ theme_pro <- function(){
 
 # Reto --------------------------------------------------------------------
 
-# Decarga los precio de los ETF's para el IPC, S&P500, y el MSCI
+# Descarga los precio de los ETF's para el IPC, S&P500, y el MSCI
 # Calcula sus retornos
 # Realiza un histograma de sus retornos con densidad en vez de conteo
+# Realiza un Facet plot para cada activo
 # HINT1: Busca en google 'Density Histogram ggplot2'
 # Hint2: Usa un DF largo (Lo genera tq por default)
+# Hint3 Revisa los plot muestra de arriba y revisa facet_wrap
 # Los valores en el eje y deben tener el simbolo %
 # Hint busca add % to y axix values ggplot2
 # Usa el theme_pro() que les regalé
@@ -191,15 +193,17 @@ theme_pro <- function(){
 data("coronavirus")
 covid19 <- coronavirus
 
-#Usa glimpse para ver las variables que contiene tu df
-#Has un resumen de cuantos casos confirmados, muertes y curados ha habido a partir
+# Usa glimpse para ver las variables que contiene tu df
+# Has un resumen de cuantos casos confirmados, muertes y curados ha habido a partir
 # de febrero para cada país
-# Hint: Usa groupb_by con las variables en cuestión y despues summarise y la función sum
+# Hint: Usa group_by con las variables en cuestión y despues summarise y la función sum
 # con la variable cases
-# Usa filter para filtrar date mayores o iguales al 31 de enero 
+# Usa filter para filtrar fechas mayores o iguales al 31 de enero 
 
-# Haz una gráfica de la evolución de los casos confirmados para méxico
+# Haz una gráfica de la evolución de los casos confirmados para US
 # HINT: usa filter con Country.Region junto con type
-## la Sintaxis para incluir dos condiciones en un mismo filter es cond1 && cond 2
+# HINT: usa antes de filtrar unique(covid19$Country.Region) par que veas
+# el encoding de los países
+## la Sintaxis para incluir dos condiciones en un mismo filter(cond1 && cond 2)
 
 
